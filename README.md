@@ -1,16 +1,41 @@
-# React + Vite
+# ChIPONChallenge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Gamified savings challenge built with React, Vite, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+## Production build
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm run build
+```
 
-## Expanding the ESLint configuration
+## GitHub Pages
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is configured for GitHub Pages using the workflow in
+`.github/workflows/deploy-pages.yml`.
+
+Important:
+
+- `Deploy from a branch` with `main` and `/root` will not build this Vite app.
+- GitHub Pages serves files from the branch; it does not run `npm install` or `vite build`.
+- For this project, use `GitHub Actions` as the Pages source.
+
+### Pages setup
+
+1. Open your repository on GitHub.
+2. Go to `Settings` -> `Pages`.
+3. Under `Build and deployment`, set `Source` to `GitHub Actions`.
+4. Push to `main`.
+
+The workflow will build the app and publish the `dist/` output automatically.
+
+## Notes
+
+- `vite.config.js` uses `base: './'` so asset paths work correctly on GitHub Pages.
+- If you insist on `main` + `/root`, you would have to commit built static files into the repository root, which is not a good workflow for this source project.
