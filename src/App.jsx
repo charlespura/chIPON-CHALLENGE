@@ -17,6 +17,14 @@ function formatDate(value) {
   }).format(new Date(`${value}T00:00:00`))
 }
 
+function formatLiveTime(value) {
+  return new Intl.DateTimeFormat('en-PH', {
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(value)
+}
+
 function parseOptionInput(value) {
   return value
     .split(',')
@@ -108,6 +116,12 @@ function WheelSpinner({
   selectedLabel = 'Selected',
 }) {
   const wheelItems = items
+  const selectedIndex = Math.max(
+    0,
+    wheelItems.findIndex((item) => item === selectedValue),
+  )
+  const wheelStep = wheelItems.length > 0 ? 360 / wheelItems.length : 0
+  const wheelRotation = -(selectedIndex * wheelStep)
   const radius = wheelItems.length > 60 ? 128 : wheelItems.length > 24 ? 122 : 118
   const itemTextClass =
     wheelItems.length > 60
@@ -138,8 +152,12 @@ function WheelSpinner({
         <div
           className={`absolute inset-0 rounded-full border-8 ${
             dark ? 'border-gold/20 bg-[#120f13]' : 'border-white/15 bg-[#8f3c1f]'
-          } ${isSpinning ? 'animate-wheel-spin' : ''}`}
+          }`}
           style={{
+            transform: `rotate(${wheelRotation}deg)`,
+            transition: isSpinning
+              ? 'transform 120ms linear'
+              : 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)',
             backgroundImage: `conic-gradient(
               from 0deg,
               ${dark ? '#2e1f20 0deg 30deg, #4b3131 30deg 60deg, #6a4848 60deg 90deg, #2e1f20 90deg 120deg, #4b3131 120deg 150deg, #6a4848 150deg 180deg, #2e1f20 180deg 210deg, #4b3131 210deg 240deg, #6a4848 240deg 270deg, #2e1f20 270deg 300deg, #4b3131 300deg 330deg, #6a4848 330deg 360deg' : '#c4532d 0deg 30deg, #de7440 30deg 60deg, #f09258 60deg 90deg, #c4532d 90deg 120deg, #de7440 120deg 150deg, #f09258 150deg 180deg, #c4532d 180deg 210deg, #de7440 210deg 240deg, #f09258 240deg 270deg, #c4532d 270deg 300deg, #de7440 300deg 330deg, #f09258 330deg 360deg'}
@@ -161,15 +179,15 @@ function WheelSpinner({
                   className={`block -rotate-[0deg] rounded-full text-center font-semibold uppercase tracking-[0.1em] ${itemTextClass} ${
                     isSelectedSlice
                       ? dark
-                        ? 'bg-gold/20 text-gold/70'
-                        : 'bg-white/20 text-white/70'
+                        ? 'bg-gold/20 ring-1 ring-gold/50 text-gold'
+                      : 'bg-white/20 text-white/70'
                       : dark
                         ? 'bg-black/30 text-parchment/85'
                         : 'bg-white/15 text-white'
                   }`}
                   style={{ transform: `rotate(${-angle}deg)` }}
                 >
-                  {isSelectedSlice ? '•' : renderValue(item)}
+                  {renderValue(item)}
                 </span>
                   )
                 })()}
@@ -364,6 +382,7 @@ function App() {
   })
   const [isAddonSpinning, setIsAddonSpinning] = useState(false)
   const [addonPreview, setAddonPreview] = useState(state.addonOptions[0] || 0)
+  const [liveNow, setLiveNow] = useState(() => new Date())
 
   const intervalRef = useRef(null)
   const timeoutRef = useRef(null)
@@ -376,6 +395,16 @@ function App() {
       window.clearTimeout(timeoutRef.current)
       window.clearInterval(addonIntervalRef.current)
       window.clearTimeout(addonTimeoutRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setLiveNow(new Date())
+    }, 1000)
+
+    return () => {
+      window.clearInterval(timerId)
     }
   }, [])
 
@@ -472,7 +501,8 @@ function App() {
               <div className="rounded-[28px] border border-gold/30 bg-black/20 px-5 py-4">
                 <p className="text-xs uppercase tracking-[0.3em] text-gold/80">Today</p>
                 <p className="mt-2 text-xl font-semibold">{formatDate(today)}</p>
-                <p className="mt-1 text-sm text-white/65">
+                <p className="mt-1 text-sm font-semibold text-gold/90">{formatLiveTime(liveNow)}</p>
+                <p className="mt-2 text-sm text-white/65">
                   {canSpin ? 'Spin is available.' : 'Today is already locked.'}
                 </p>
               </div>
@@ -502,7 +532,7 @@ function App() {
 
             <div className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="rounded-[32px] border border-white/10 bg-[#fff7ea] p-6 text-ink">
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs uppercase tracking-[0.3em] text-wine/70">Spin Chamber</p>
                     <p className="mt-2 text-sm text-ink/60">
@@ -515,14 +545,11 @@ function App() {
                       Active range: 1 to {state.totalDays}
                     </p>
                   </div>
-                  <div
-                    className={`grid h-16 w-16 place-items-center rounded-full border-4 ${
-                      isSpinning
-                        ? 'animate-spin border-ember border-t-transparent'
-                        : 'border-forest/25'
-                    }`}
-                  >
-                    <span className="text-lg font-semibold">{remainingDays.length}</span>
+                  <div className="rounded-[22px] border border-forest/15 bg-forest/5 px-4 py-3 text-right">
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-forest/60">
+                      Remaining
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-ink">{remainingDays.length}</p>
                   </div>
                 </div>
 
