@@ -1,4 +1,6 @@
 # ChIPONChallenge
+<img width="800" height="500" alt="Screenshot 2026-03-29 at 12 57 57 AM" src="https://github.com/user-attachments/assets/c73a81f3-302f-4a30-9ecd-df10061d31a7" />
+<img width="800" height="599" alt="Screenshot 2026-03-29 at 12 58 08 AM" src="https://github.com/user-attachments/assets/ba5390d4-37bf-403e-8e90-3c094339b567" />
 
 ChIPONChallenge is a gamified daily savings app built with React, Vite, and Tailwind CSS.
 
